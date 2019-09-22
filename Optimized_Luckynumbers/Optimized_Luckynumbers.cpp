@@ -56,26 +56,31 @@ std::string getEncodingFromInt(unsigned int uInt32Bit) {
 	//left hand side of the mostSignificantBit
 	
 	static const size_t maxBits = 32;
-	std::string tempstr =std::to_string(uInt32Bit);
-	auto realBitsUsed = tempstr.size(); //actual bits necessary for representing the number
-	auto emptyBits = maxBits - realBitsUsed;
-	std::string emptystr;
-	
-	for (size_t i = 0; i < emptyBits; i++) { //get some empty space, which are not being used to represent thenumber but fill the integer anyway
-		emptystr += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
+	std::string tempstr;
+
+	//put the binaryDigits into string form e.g. "100101"
+	/*bool b[4];
+int v = 7;  // number to dissect
+
+for (int j = 0;  j < 4;  ++j)
+   b [j] =  0 != (v & (1 << j));*/
+
+	for (size_t i = 0; i < maxBits; i++) {
+		auto temp1 = 0 != (uInt32Bit & (1 << i));
+		if (temp1) {
+			tempstr.insert(0, "1");
+		} else {
+			tempstr.insert(0, "0");
+		}
 	}
-
-	tempstr.insert(0, emptystr); //insert the emptybits prepended into the front of the string
+	
+	//declare emptyBits on the lefthand side of the mostSignificantBit =1
+	//so that we only utilize as many bits as required.
+	for (size_t i = 0; tempstr[i] != '1'; i++) {
+		tempstr[i] = '-';
+	}
 	int debug2 = 9;
-	return tempstr;
-
-
-	
-
-
-	//s1.insert(0, s2); // insert the contents of s2 at offset 0 in s1
-
-	
+	return tempstr;	
 }
 
 unsigned int getLuckyNumbers2(unsigned int N) {
@@ -87,7 +92,7 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 	for (size_t i = 0; i < maxBits; i++) { //32bits of empty space into the string to initialize luckycandidate
 		luckycandidate += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
 	}
-	luckycandidate[maxBits - 1] = 0;
+	luckycandidate[maxBits - 1] = '0';
 
 	/*because there are two luckydigits only, then we can represent the decimaldigits
 	4 and 7 (the real lucky digits) as binarydigits (bits) instead
@@ -112,21 +117,15 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 	except that in this case the "digitalclock digits" are simply the allowed digits of the allowed particular 
 	numberbase of the baseN_number*/
 
-	unsigned int luckyint = 0, luckytemp=0,j = 0;
-
-	while (1){
-		luckytemp = getIntFromEncoding(luckycandidate);
-		j++;
-
-		
-		
+	unsigned int luckyint = 0, luckytemp=0,counter = 0;
+	unsigned int luckiesTotal = 0;
+	while (luckyint < N){
+		luckyint = getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
+		counter++; //increment intCounter, from which we get the next enumerated luckynumber
+		luckiesTotal++;
+		luckycandidate = getEncodingFromInt(counter); //store the intCounter encoded format into luckycandidate
 	}
-
-	
-
-
-
-	return 0;
+	return luckiesTotal;
 }
 
 
@@ -136,7 +135,7 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 int main()
 {
     std::cout << "Hello World!\n";
-	std::string str;
+	/*	std::string str;
 	for (size_t i = 0; i < 32; i++) {
 		if (i >= 29 && i<= 31) {
 			str += '0';
@@ -154,9 +153,10 @@ int main()
 	int kakka = 4;
 
 	auto result2 = getEncodingFromInt(result);
-	kakka = 33;
+	kakka = 33;*/
 
-
+	auto luckycount = getLuckyNumbers2(1000000);
+	int debug3 = 5;
 	
 
 
