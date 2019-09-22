@@ -16,6 +16,28 @@ luckynumber is any number which consists of only the digits 4 or 7.
 e.g. 44,444, 474, 774, 747, 7777...
 */
 
+unsigned int getIntDigitCount(unsigned int n) {
+	//note input should be between range [1, uintmax]
+	//no input with zero
+	unsigned int d = 0;
+	if (n == 0) return 1;
+	//basically O(1) here
+	while (n > 0) {
+		n /= 10;
+		++d;
+	}
+	return d;
+}
+
+bool checkAllPermutationsFinished(const std::string& binstr) {
+	for (auto& c : binstr) {
+		if (c == '0') {
+			return false;
+		}
+	}
+	 return true;
+}
+
 unsigned int getIntFromEncoding(const std::string& uInt32BitStr) {
 	/*loop the string to get the chars
 	if the char is 0 => it will become 4
@@ -102,6 +124,8 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 	static const size_t maxBits = 32;
 	static const std::vector< unsigned int> luckydigits { 4, 7 }; 
 	std::string luckycandidate;
+	
+	
 	for (size_t i = 0; i < maxBits; i++) { //32bits of empty space into the string to initialize luckycandidate
 		luckycandidate += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
 	}
@@ -131,17 +155,29 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 	numberbase of the baseN_number*/
 
 	unsigned int luckyint = 0, luckytemp=0,counter = 0;
-	unsigned int luckiesTotal = 0;
-	while (1){
+	unsigned int luckiesTotal = 0, customDigitCount=1;
+	unsigned int n_digitcount = getIntDigitCount(N);
+
+	bool looping = true;
+	//customDigitCount <= n_digitcount && checkAllPermutationsFinished(luckycandidate)
+	while ( looping  ){
 		luckyint = getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
-		if (luckyint < N) {
-			counter++; //increment intCounter, from which we get the next enumerated luckynumber
+		customDigitCount = getIntDigitCount(luckyint);
+		if (luckyint <= N) {
 			luckiesTotal++;
-			luckycandidate = getEncodingFromInt(counter); //store the intCounter encoded format into luckycandidate
-		} else {
-			break;
+		} 
+		
+		if (customDigitCount > n_digitcount && checkAllPermutationsFinished(luckycandidate)) {
+			looping=false;
 		}
+
+		counter++; //increment intCounter, from which we get the next enumerated luckynumber
+		luckycandidate = getEncodingFromInt(counter); //store the intCounter encoded format into luckycandidate
+		int debug5 = 5;
 	}
+
+
+
 	return luckiesTotal;
 }
 
@@ -151,8 +187,10 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 
 int main()
 {
+	unsigned int N = 50;
     std::cout << "Hello World!\n";
-	auto luckycount = getLuckyNumbers2(10000);
+	auto luckycount = getLuckyNumbers2(N);
+	std::cout << "N=" << N << " , luckynumbersCount was: " << luckycount << std::endl;
 	int debug3 = 5;
 	
 
