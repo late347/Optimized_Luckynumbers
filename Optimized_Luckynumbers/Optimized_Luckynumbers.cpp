@@ -22,8 +22,10 @@ unsigned int getIntFromEncoding(const std::string& uInt32BitStr) {
 	if the char is 1 => it will become 7
 	use libraryfunction to get the decimalvalue and return it
 	*/
+	static const size_t maxBits = 32;
+
 	std::string tempcopy(uInt32BitStr);
-	for (size_t i = 0; i < 32; i++) {
+	for (size_t i = 0; i < maxBits; i++) {
 		if (tempcopy[i] == '0') {
 			tempcopy[i] = '4';
 
@@ -33,7 +35,7 @@ unsigned int getIntFromEncoding(const std::string& uInt32BitStr) {
 	}
 	//empty bits are those that arent used for either 0 or 1 on the mostSignificantSide of the uint32 bit number
 	std::string cleanedFromEmptyBits; 
-	for (size_t i = 0; i < 32; i++) {
+	for (size_t i = 0; i < maxBits; i++) {
 		if (tempcopy[i] != '-') {
 			cleanedFromEmptyBits += tempcopy[i];
 		}
@@ -47,18 +49,45 @@ unsigned int getIntFromEncoding(const std::string& uInt32BitStr) {
 }
 
 
+std::string getEncodingFromInt(unsigned int uInt32Bit) {
+	//encode the unsigned int into cppstring
+	//where the emptybits are -, and other bits are of course 0 and 1
+	//emptybits would be unnecessary bits of 32bit integer that aren't being used to represent the number, on the
+	//left hand side of the mostSignificantBit
+	
+	static const size_t maxBits = 32;
+	std::string tempstr =std::to_string(uInt32Bit);
+	auto realBitsUsed = tempstr.size(); //actual bits necessary for representing the number
+	auto emptyBits = maxBits - realBitsUsed;
+	std::string emptystr;
+	
+	for (size_t i = 0; i < emptyBits; i++) { //get some empty space, which are not being used to represent thenumber but fill the integer anyway
+		emptystr += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
+	}
 
+	tempstr.insert(0, emptystr); //insert the emptybits prepended into the front of the string
+	int debug2 = 9;
+	return tempstr;
+
+
+	
+
+
+	//s1.insert(0, s2); // insert the contents of s2 at offset 0 in s1
+
+	
+}
 
 unsigned int getLuckyNumbers2(unsigned int N) {
 	/*put the luckydigits into INCREASING ORDER like 1,2,3...
 	that is a requirement for this algorithm to work in the first place*/
-	const size_t maxBits = 32;
-	const std::vector< unsigned int> luckydigits { 4, 7 }; 
+	static const size_t maxBits = 32;
+	static const std::vector< unsigned int> luckydigits { 4, 7 }; 
 	std::string luckycandidate;
 	for (size_t i = 0; i < maxBits; i++) { //32bits of empty space into the string to initialize luckycandidate
 		luckycandidate += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
 	}
-
+	luckycandidate[maxBits - 1] = 0;
 
 	/*because there are two luckydigits only, then we can represent the decimaldigits
 	4 and 7 (the real lucky digits) as binarydigits (bits) instead
@@ -83,7 +112,15 @@ unsigned int getLuckyNumbers2(unsigned int N) {
 	except that in this case the "digitalclock digits" are simply the allowed digits of the allowed particular 
 	numberbase of the baseN_number*/
 
+	unsigned int luckyint = 0, luckytemp=0,j = 0;
 
+	while (1){
+		luckytemp = getIntFromEncoding(luckycandidate);
+		j++;
+
+		
+		
+	}
 
 	
 
@@ -116,19 +153,11 @@ int main()
 	std::cout << result << std::endl;
 	int kakka = 4;
 
+	auto result2 = getEncodingFromInt(result);
+	kakka = 33;
+
 
 	
 
 
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
