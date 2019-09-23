@@ -74,24 +74,26 @@ unsigned int getIntFromEncoding(const std::string& uInt32BitStr) {
 	return returnableres;
 }
 
-unsigned int getCustomDigitCount(const std::string& binaryUint32) {
-	/*calculate how many real digits exists in the binaryUint32
-	discounting emptybits '-'
-	counting '0'
-	counting '1'
 
-	if digitCount returned into the caller, is one more than than the original N digitcount
-	Then we stop looping
-	*/
-	static const int maxBits = 32;
-	unsigned int digitcount = 0;
-	for (size_t i = 0; i < maxBits; i++) {
-		if (binaryUint32[i] == '0' || binaryUint32[i]=='1') {
-			++digitcount;
-		}
-	}
-	return digitcount;
-}
+//NOTE this is old un-used func
+//unsigned int getCustomDigitCount(const std::string& binaryUint32) {
+//	/*calculate how many real digits exists in the binaryUint32
+//	discounting emptybits '-'
+//	counting '0'
+//	counting '1'
+//
+//	if digitCount returned into the caller, is one more than than the original N digitcount
+//	Then we stop looping
+//	*/
+//	static const int maxBits = 32;
+//	unsigned int digitcount = 0;
+//	for (size_t i = 0; i < maxBits; i++) {
+//		if (binaryUint32[i] == '0' || binaryUint32[i]=='1') {
+//			++digitcount;
+//		}
+//	}
+//	return digitcount;
+//}
 
 std::string getEncodingFromInt(unsigned int uInt32Bit, unsigned int unavailableBits) {
 	//encode the unsigned int into cppstring
@@ -123,69 +125,73 @@ std::string getEncodingFromInt(unsigned int uInt32Bit, unsigned int unavailableB
 	return tempstr;	
 }
 
-unsigned int getLuckyNumbers2(unsigned int N) {
-	/*put the luckydigits into INCREASING ORDER like 1,2,3...
-	that is a requirement for this algorithm to work in the first place*/
-	static const size_t maxBits = 32;
-	static const std::vector< unsigned int> luckydigits { 4, 7 }; 
-	std::string luckycandidate;
-	
-	
-	for (size_t i = 0; i < maxBits; i++) { //32bits of empty space into the string to initialize luckycandidate
-		luckycandidate += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
-	}
-	luckycandidate[maxBits - 1] = '0';
-
-	/*because there are two luckydigits only, then we can represent the decimaldigits
-	4 and 7 (the real lucky digits) as binarydigits (bits) instead
-	
-	This allows us to increment loop the luckycandidate variable. Luckycandidate's own 
-	binarydigits represent the 4 and the 7, (0, and 1 respectively, also in increasing order)
-
-	Then, we can get all the binarydigits(bits) and transform the bits back into the decimaldigits
-	Then, when we have the decimaldigits stored e.g. into an int array, or vector of ints, we can compare if 
-	the decimalcandidate_number is too large for the N comparison value
-		=>if too large, stop loop and return the countedLuckies (countedLuckies is how many luckies we have found)
-		=>if smaller or same, continue and increment countedLuckies
-
-	This way has the benefit that it keeps the permutations of the luckynumbers in increasing order of size naturally
-	due to the way that binarydigits, binary addition works. 01 => 11 => 100 etc.
-	The code could theoretically be modified to work with other number bases such as base3,base4,base5 ... base10
-	but then you would need to store the baseN_representation in somehow different way than to simply 
-	rely on the binarydigits(bits).
-	
-	For bigger numberbases than base2, you maybe need to make a numberclass, that works like a digitalclock
-	where there are digits for each place of the clocknumbers like seconds, tensOfSeconds etc...
-	except that in this case the "digitalclock digits" are simply the allowed digits of the allowed particular 
-	numberbase of the baseN_number*/
-
-	unsigned int luckyint = 0, luckytemp=0,counter = 0;
-	unsigned int luckiesTotal = 0, customDigitCount=1;
-	unsigned int n_digitcount = getIntDigitCount(N);
-	const unsigned int unavailableBits = maxBits - n_digitcount;
-
-	bool looping = true;
-	//customDigitCount <= n_digitcount && checkAllPermutationsFinished(luckycandidate)
-	while ( looping  ){
-		luckyint = getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
-		customDigitCount = getIntDigitCount(luckyint);
-		if (luckyint <= N) {
-			luckiesTotal++;
-		} 
-		
-		if (customDigitCount > n_digitcount && checkAllPermutationsFinished(luckycandidate)) {
-			looping=false;
-		}
-
-		counter++; //increment intCounter, from which we get the next enumerated luckynumber
-		luckycandidate = getEncodingFromInt(counter, unavailableBits); //store the intCounter encoded format into luckycandidate
-		int debug5 = 5;
-	}
 
 
 
-	return luckiesTotal;
-}
+//NOTE THIS FUNC IS BUGGED
+//unsigned int getLuckyNumbers2(unsigned int N) {
+//	/*put the luckydigits into INCREASING ORDER like 1,2,3...
+//	that is a requirement for this algorithm to work in the first place*/
+//	static const size_t maxBits = 32;
+//	static const std::vector< unsigned int> luckydigits { 4, 7 }; 
+//	std::string luckycandidate;
+//	
+//	
+//	for (size_t i = 0; i < maxBits; i++) { //32bits of empty space into the string to initialize luckycandidate
+//		luckycandidate += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
+//	}
+//	luckycandidate[maxBits - 1] = '0';
+//
+//	/*because there are two luckydigits only, then we can represent the decimaldigits
+//	4 and 7 (the real lucky digits) as binarydigits (bits) instead
+//	
+//	This allows us to increment loop the luckycandidate variable. Luckycandidate's own 
+//	binarydigits represent the 4 and the 7, (0, and 1 respectively, also in increasing order)
+//
+//	Then, we can get all the binarydigits(bits) and transform the bits back into the decimaldigits
+//	Then, when we have the decimaldigits stored e.g. into an int array, or vector of ints, we can compare if 
+//	the decimalcandidate_number is too large for the N comparison value
+//		=>if too large, stop loop and return the countedLuckies (countedLuckies is how many luckies we have found)
+//		=>if smaller or same, continue and increment countedLuckies
+//
+//	This way has the benefit that it keeps the permutations of the luckynumbers in increasing order of size naturally
+//	due to the way that binarydigits, binary addition works. 01 => 11 => 100 etc.
+//	The code could theoretically be modified to work with other number bases such as base3,base4,base5 ... base10
+//	but then you would need to store the baseN_representation in somehow different way than to simply 
+//	rely on the binarydigits(bits).
+//	
+//	For bigger numberbases than base2, you maybe need to make a numberclass, that works like a digitalclock
+//	where there are digits for each place of the clocknumbers like seconds, tensOfSeconds etc...
+//	except that in this case the "digitalclock digits" are simply the allowed digits of the allowed particular 
+//	numberbase of the baseN_number*/
+//
+//	unsigned int luckyint = 0, luckytemp=0,counter = 0;
+//	unsigned int luckiesTotal = 0, customDigitCount=1;
+//	unsigned int n_digitcount = getIntDigitCount(N);
+//	const unsigned int unavailableBits = maxBits - n_digitcount;
+//
+//	bool looping = true;
+//	//customDigitCount <= n_digitcount && checkAllPermutationsFinished(luckycandidate)
+//	while ( looping  ){
+//		luckyint = getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
+//		customDigitCount = getIntDigitCount(luckyint);
+//		if (luckyint <= N) {
+//			luckiesTotal++;
+//		} 
+//		
+//		if (customDigitCount > n_digitcount && checkAllPermutationsFinished(luckycandidate)) {
+//			looping=false;
+//		}
+//
+//		counter++; //increment intCounter, from which we get the next enumerated luckynumber
+//		luckycandidate = getEncodingFromInt(counter, unavailableBits); //store the intCounter encoded format into luckycandidate
+//		int debug5 = 5;
+//	}
+//
+//
+//
+//	return luckiesTotal;
+//}
 
 unsigned int getLuckyNumbers3(unsigned int N) {
 
@@ -217,7 +223,7 @@ unsigned int getLuckyNumbers3(unsigned int N) {
 	for (unsigned int i = 1; i < n_digitcount; i++) {
 		luckiesTotal += round(pow(2,i));
 	}
-	int debug67 = 67;
+	int debug67 = 67; //only for debugbreakpoints
 
 	while (looping) {
 
@@ -234,7 +240,7 @@ unsigned int getLuckyNumbers3(unsigned int N) {
 
 		counter++; //increment intCounter, from which we get the next enumerated luckynumber
 		luckycandidate = getEncodingFromInt(counter, unavailableBits); //store the intCounter into encoded format in luckycandidate
-		int debug5 = 5;
+		int debug5 = 5;//only for debugbreakpoints
 
 	}
 
@@ -249,9 +255,10 @@ unsigned int getLuckyNumbers3(unsigned int N) {
 
 int main()
 {
-	unsigned int N = 1000'000'000;
+	unsigned int N = 1000'000'000-1;
     std::cout << "Hello World!\n";
-	auto res0 = getLuckyNumbers3(N);
+	auto foundLuckiesCount = getLuckyNumbers3(N);
+	std::cout << "N=" << N << ", luckynumbers_count was: " << foundLuckiesCount << std::endl;
 	
 
 
