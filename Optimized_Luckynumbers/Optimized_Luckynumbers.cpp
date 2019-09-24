@@ -16,6 +16,29 @@ luckynumber is any number which consists of only the digits 4 or 7.
 e.g. 44,444, 474, 774, 747, 7777...
 */
 
+//the clear way to calculate the luckynumbers
+//iterate thru all of them
+// timecomplexity O(N), laggy with huge numbers
+unsigned int dumbLucky(unsigned int num) {
+	static const unsigned int lucky4 = 4, lucky7 = 7;
+	while (num > 0) {
+		if (!(num % 10 == lucky4 || num % 10 == lucky7))
+			return 0;
+		num = num / 10;
+	}
+	return 1;
+}
+
+
+
+//simple helper func to calculate powers of 2
+unsigned int pow2(unsigned int n) {
+	unsigned int val = 1;
+	val = (1 << n);
+	return val;
+}
+
+
 unsigned int getIntDigitCount(unsigned int n) {
 	//note input should be between range [1, uintmax]
 	//no input with zero
@@ -221,7 +244,8 @@ unsigned int getLuckyNumbers3(unsigned int N) {
 	where digit is smaller than the actual digitcount of N, let's imagine
 	that N would have digitcount=4 at this point*/
 	for (unsigned int i = 1; i < n_digitcount; i++) {
-		luckiesTotal += round(pow(2,i));
+		//luckiesTotal += round(pow(2,i));
+		luckiesTotal += pow2(i);
 	}
 	int debug67 = 67; //only for debugbreakpoints
 
@@ -257,9 +281,34 @@ int main()
 {
 	unsigned int N = 1000'000'000-1;
     std::cout << "Hello World!\n";
+	auto start = std::chrono::high_resolution_clock::now();
 	auto foundLuckiesCount = getLuckyNumbers3(N);
-	std::cout << "N=" << N << ", luckynumbers_count was: " << foundLuckiesCount << std::endl;
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	std::cout << "N=" << N << ", luckynumbers_count was: " << foundLuckiesCount << ", duration was us="<< duration.count() <<std::endl;
 	
+
+	unsigned int dumbLuckyCount = 0;
+	 start = std::chrono::high_resolution_clock::now();
+	for (unsigned int j = 1; j <= N; ++j) {
+		dumbLuckyCount += dumbLucky(j);
+	}
+	// After function call 
+	 stop = std::chrono::high_resolution_clock::now();
+	// Subtract stop and start timepoints and 
+	// cast it to required unit. Predefined units 
+	// are nanoseconds, microseconds, milliseconds, 
+	// seconds, minutes, hours. Use duration_cast() 
+	// function. 
+	 duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+	
+
+
+
+	std::cout << "dumbLucky count was: " << dumbLuckyCount << ", duration was us=" << duration.count() << std::endl;
+
+
 
 
 }
