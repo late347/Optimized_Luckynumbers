@@ -24,6 +24,8 @@ e.g. 44,444, 474, 774, 747, 7777...
 //the clear way to calculate the luckynumbers
 //iterate thru all of them
 // timecomplexity O(N), laggy with huge numbers
+// this function below actually just checks if 
+// a single number num == luckynumber
 unsigned int dumbLucky(unsigned int num) {
 	static const unsigned int lucky4 = 4, lucky7 = 7;
 	while (num > 0) {
@@ -436,7 +438,9 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 
 int main()
 {
-	unsigned int N = 1000'000'000-1;
+	unsigned int mediuminput = 888'888'888;
+	unsigned int largeinput= (2147'483'640 - 1) * 2;
+	unsigned int N = mediuminput;
     std::cout << "Hello World!\n";
 	auto start = std::chrono::high_resolution_clock::now();
 	auto foundLuckiesCount = refactored_getLuckyNumbers3(N);
@@ -445,24 +449,18 @@ int main()
 	std::cout << "N=" << N << ", luckynumbers_count was: " << foundLuckiesCount << ", duration was us="<< duration.count() <<std::endl;
 	
 
+
+
+	// probably commenc out this dumbLucky calculation if you have large inputsizes N
+	// it will be super laggy
+	// bearable but laggy  choice for comparison for size of N might be N == 888'888'888
 	unsigned int dumbLuckyCount = 0;
 	 start = std::chrono::high_resolution_clock::now();
 	for (unsigned int j = 1; j <= N; ++j) {
 		dumbLuckyCount += dumbLucky(j);
 	}
-	// After function call 
 	 stop = std::chrono::high_resolution_clock::now();
-	// Subtract stop and start timepoints and 
-	// cast it to required unit. Predefined units 
-	// are nanoseconds, microseconds, milliseconds, 
-	// seconds, minutes, hours. Use duration_cast() 
-	// function. 
 	 duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-
-	
-
-
-
 	std::cout << "dumbLucky count was: " << dumbLuckyCount << ", duration was us=" << duration.count() << std::endl;
 
 
