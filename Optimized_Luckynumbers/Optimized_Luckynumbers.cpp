@@ -438,7 +438,7 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 
 int main()
 {
-	unsigned int mediuminput = 888'888'888;
+	unsigned int mediuminput = 888888888;
 	unsigned int largeinput= (2147'483'640 - 1) * 2;
 	unsigned int N = mediuminput;
     std::cout << "Hello World!\n";
