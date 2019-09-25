@@ -8,9 +8,10 @@
 #include <vector>
 #include <cstdlib>
 
+typedef unsigned long long ull;
 
 namespace globals {
-	static const unsigned int g_maxBits = 32;
+	static const size_t g_maxBits = 64;
 }
 
 
@@ -26,8 +27,8 @@ e.g. 44,444, 474, 774, 747, 7777...
 // timecomplexity O(N), laggy with huge numbers
 // this function below actually just checks if 
 // a single number num == luckynumber
-unsigned int dumbLucky(unsigned int num) {
-	static const unsigned int lucky4 = 4, lucky7 = 7;
+size_t dumbLucky(size_t num) {
+	static const size_t lucky4 = 4, lucky7 = 7;
 	while (num > 0) {
 		if (!(num % 10 == lucky4 || num % 10 == lucky7))
 			return 0;
@@ -39,17 +40,17 @@ unsigned int dumbLucky(unsigned int num) {
 
 
 //simple helper func to calculate powers of 2
-unsigned int pow2(unsigned int n) {
-	unsigned int val = 1;
-	val = (1 << n);
+size_t pow2(size_t n) {
+	size_t val = 1;
+	val = ((size_t)1 << n);
 	return val;
 }
 
 
-unsigned int getIntDigitCount(unsigned int n) {
+size_t getIntDigitCount(size_t n) {
 	//note input should be between range [1, uintmax]
 	//no input with zero
-	unsigned int d = 0;
+	size_t d = 0;
 	if (n == 0) return 1;
 	//basically O(1) here
 	while (n > 0) {
@@ -70,41 +71,8 @@ bool checkAllPermutationsFinished(const std::string& binstr) {
 	 //available in memory for that integer n
 }
 
-unsigned int getIntFromEncoding(const std::string& uInt32BitStr) {
-	/*loop the string to get the chars
-	if the char is 0 => it will become 4
-	if the char is 1 => it will become 7
-	use libraryfunction to get the decimalvalue and return it
-	*/
-	static const size_t maxBits = 32;
-	std::string tempcopy(uInt32BitStr);
 
-	for (size_t i = 0; i < maxBits; i++) {
-		if (tempcopy[i] == '0') {
-			tempcopy[i] = '4';
-
-		} else if (tempcopy[i]=='1') {
-			tempcopy[i] = '7';
-		}
-	}
-
-	//empty bits are those that arent used for either 0 or 1 on the mostSignificantSide of the uint32 bit number
-	std::string cleanedFromEmptyBits; 
-	
-	for (size_t i = 0; i < maxBits; i++) {
-		if (tempcopy[i] != '-') {
-			cleanedFromEmptyBits += tempcopy[i];
-		}
-	}
-	auto res = strtoul(cleanedFromEmptyBits.c_str(), 0, 10);
-	//danger if overflows because of narrowingConversion from unsigned long into unsigned int, but 
-	//inputs should be only 32bit unsigned numbers input string reference
-	
-	unsigned int returnableres =  static_cast<unsigned int>(res);
-	return returnableres;
-}
-
-unsigned int refactored_getIntFromEncoding(const std::string& uInt32BitStr) {
+size_t refactored_getIntFromEncoding(const std::string& uInt32BitStr) {
 	/*loop the string to get the chars
 	if the char is 0 => it will become 4
 	if the char is 1 => it will become 7
@@ -131,72 +99,24 @@ unsigned int refactored_getIntFromEncoding(const std::string& uInt32BitStr) {
 			cleanedFromEmptyBits[i] = tempcopy[i];
 		}
 	}
-	auto res = strtoul(cleanedFromEmptyBits.c_str(), 0, 10);
+	//auto res = strtoul(cleanedFromEmptyBits.c_str(), 0, 10);
+	auto res0 = strtoull(cleanedFromEmptyBits.c_str(), 0, 10);
 	//danger if overflows because of narrowingConversion from unsigned long into unsigned int, but 
 	//inputs should be only 32bit unsigned numbers input string reference
 
-	unsigned int returnableres = static_cast<unsigned int>(res);
-	return returnableres;
+	return res0;
 }
 
 
-//NOTE this is old un-used func
-//unsigned int getCustomDigitCount(const std::string& binaryUint32) {
-//	/*calculate how many real digits exists in the binaryUint32
-//	discounting emptybits '-'
-//	counting '0'
-//	counting '1'
-//
-//	if digitCount returned into the caller, is one more than than the original N digitcount
-//	Then we stop looping
-//	*/
-//	static const int maxBits = 32;
-//	unsigned int digitcount = 0;
-//	for (size_t i = 0; i < maxBits; i++) {
-//		if (binaryUint32[i] == '0' || binaryUint32[i]=='1') {
-//			++digitcount;
-//		}
-//	}
-//	return digitcount;
-//}
-
-std::string getEncodingFromInt(unsigned int uInt32Bit, unsigned int unavailableBits) {
-	//encode the unsigned int into cppstring
-	//where the unavailableBits are -, and other bits are of course 0 and 1
-	//unavailableBits would be "forbidden bits" so that the other bits are "memorybits"
-	//so to re-cap, memorybits are any bits that are allowedmemory from 32bit int
-	//and unavailableBits are any bits that are unavailablememory from 32bit int
-	
-	static const size_t maxBits = 32;
-	std::string tempstr;
-
-	//put the binaryDigits into string form e.g. "100101"
-
-	for (size_t i = 0; i < maxBits; i++) {
-		auto temp1 = 0 != (uInt32Bit & (1 << i));
-		if (temp1) {
-			tempstr.insert(0, "1");
-		} else {
-			tempstr.insert(0, "0");
-		}
-	}
-	int debug0 = 88;//only for debugbreakpoints
-	//declare emptyBits on the lefthand side of the mostSignificantBit =1
-	//so that we only utilize as many bits as required.
-	for (size_t i = 0; i < unavailableBits; i++) {
-		tempstr[i] = '-';
-	}
-	int debug2 = 9;//only for debugbreakpoints
-	return tempstr;	
-}
 
 
-bool getBitPosition(const unsigned int& u32Integer, const unsigned int& bitPos) {
-	bool bit = 0 != (u32Integer & (1 << bitPos));
+
+bool getBitPosition(const size_t& number, const size_t& bitPos) {
+	bool bit = 0 != (number & ((size_t)1 << bitPos));
 	return bit;
 }
 
-std::string refactored_getEncodingFromInt(unsigned int uInt32Bit, unsigned int unavailableBits) {
+std::string refactored_getEncodingFromInt(size_t number, size_t unavailableBits) {
 	//encode the unsigned int into cppstring
 	//where the unavailableBits are -, and other bits are of course 0 and 1
 	//unavailableBits would be "forbidden bits" so that the other bits are "memorybits"
@@ -209,19 +129,19 @@ std::string refactored_getEncodingFromInt(unsigned int uInt32Bit, unsigned int u
 	//put the binaryDigits into string form e.g. "100101"
 
 	for (auto i = 0; i < globals::g_maxBits; i++) {
-		auto temp1 = getBitPosition(uInt32Bit, i);
+		auto temp1 = getBitPosition(number, i);
 		if (temp1) {
 			//tempstr.insert(0, "1");
-			tempstr[globals::g_maxBits - 1 - i] = '1';
+			tempstr[globals::g_maxBits - (size_t)1 - ( size_t)i] = '1';
 		} else {
 			//tempstr.insert(0, "0");
-			tempstr[globals::g_maxBits - 1 - i] = '0';
+			tempstr[globals::g_maxBits - ( size_t)1 - ( size_t)i] = '0';
 		}
 	}
 	int debug88 = 88;//only for debugbreakpoints
 	//declare emptyBits on the lefthand side of the mostSignificantBit =1
 	//so that we only utilize as many bits as required.
-	for (unsigned int i = 0; i < unavailableBits; i++) {
+	for (auto i = 0; i < unavailableBits; i++) {
 		tempstr[i] = '-';
 	}
 	int debug9 = 9;//only for debugbreakpoints
@@ -230,139 +150,15 @@ std::string refactored_getEncodingFromInt(unsigned int uInt32Bit, unsigned int u
 
 
 
-//NOTE THIS FUNC IS BUGGED
-//unsigned int getLuckyNumbers2(unsigned int N) {
-//	/*put the luckydigits into INCREASING ORDER like 1,2,3...
-//	that is a requirement for this algorithm to work in the first place*/
-//	static const size_t maxBits = 32;
-//	static const std::vector< unsigned int> luckydigits { 4, 7 }; 
-//	std::string luckycandidate;
-//	
-//	
-//	for (size_t i = 0; i < maxBits; i++) { //32bits of empty space into the string to initialize luckycandidate
-//		luckycandidate += '-'; //put a minus sign to represent empty space (not being used by 0 and neither by 1)
-//	}
-//	luckycandidate[maxBits - 1] = '0';
-//
-//	/*because there are two luckydigits only, then we can represent the decimaldigits
-//	4 and 7 (the real lucky digits) as binarydigits (bits) instead
-//	
-//	This allows us to increment loop the luckycandidate variable. Luckycandidate's own 
-//	binarydigits represent the 4 and the 7, (0, and 1 respectively, also in increasing order)
-//
-//	Then, we can get all the binarydigits(bits) and transform the bits back into the decimaldigits
-//	Then, when we have the decimaldigits stored e.g. into an int array, or vector of ints, we can compare if 
-//	the decimalcandidate_number is too large for the N comparison value
-//		=>if too large, stop loop and return the countedLuckies (countedLuckies is how many luckies we have found)
-//		=>if smaller or same, continue and increment countedLuckies
-//
-//	This way has the benefit that it keeps the permutations of the luckynumbers in increasing order of size naturally
-//	due to the way that binarydigits, binary addition works. 01 => 11 => 100 etc.
-//	The code could theoretically be modified to work with other number bases such as base3,base4,base5 ... base10
-//	but then you would need to store the baseN_representation in somehow different way than to simply 
-//	rely on the binarydigits(bits).
-//	
-//	For bigger numberbases than base2, you maybe need to make a numberclass, that works like a digitalclock
-//	where there are digits for each place of the clocknumbers like seconds, tensOfSeconds etc...
-//	except that in this case the "digitalclock digits" are simply the allowed digits of the allowed particular 
-//	numberbase of the baseN_number*/
-//
-//	unsigned int luckyint = 0, luckytemp=0,counter = 0;
-//	unsigned int luckiesTotal = 0, customDigitCount=1;
-//	unsigned int n_digitcount = getIntDigitCount(N);
-//	const unsigned int unavailableBits = maxBits - n_digitcount;
-//
-//	bool looping = true;
-//	//customDigitCount <= n_digitcount && checkAllPermutationsFinished(luckycandidate)
-//	while ( looping  ){
-//		luckyint = getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
-//		customDigitCount = getIntDigitCount(luckyint);
-//		if (luckyint <= N) {
-//			luckiesTotal++;
-//		} 
-//		
-//		if (customDigitCount > n_digitcount && checkAllPermutationsFinished(luckycandidate)) {
-//			looping=false;
-//		}
-//
-//		counter++; //increment intCounter, from which we get the next enumerated luckynumber
-//		luckycandidate = getEncodingFromInt(counter, unavailableBits); //store the intCounter encoded format into luckycandidate
-//		int debug5 = 5;
-//	}
-//
-//
-//
-//	return luckiesTotal;
-//}
-
-
-//NOTE this is older versions of the algorithm but it still works, pretty much
-//it was later refactored a bit into nicer and cleaner looking code
-unsigned int getLuckyNumbers3(unsigned int N) {
-
-	static const size_t maxBits = 32;
-	static const std::vector< unsigned int> luckydigits{ 4, 7 };
-	std::string luckycandidate;
-
-	unsigned int n_digitcount = getIntDigitCount(N);
-	const unsigned int unavailableBits = maxBits - n_digitcount; 
-
-	/*format a binary number with only k memorybits available
-	where k = digitCountOfN, and initialize all available bits in memory to 0 value*/
-	for (size_t i = 0; i < maxBits; i++) { 
-		if (i < unavailableBits) {
-			luckycandidate += '-'; //put a minus sign to represent unavailable storage bits (not being used by 0 and neither by 1)
-		} else {
-			luckycandidate += '0';
-		}
-	}
-
-	luckycandidate[maxBits - 1] = '0';
-	unsigned int luckyint = 0, luckytemp = 0, counter = 0;
-	unsigned int luckiesTotal = 0, luckyDigitCount = 1;
-	bool looping = true;
-
-	/*count the actual luckynumbers in 1digit, 2digit 3digit numbers
-	where digit is smaller than the actual digitcount of N, let's imagine
-	that N would have digitcount=4 at this point*/
-	for (unsigned int i = 1; i < n_digitcount; i++) {
-		//luckiesTotal += round(pow(2,i));
-		luckiesTotal += pow2(i);
-	}
-	int debug67 = 67; //only for debugbreakpoints
-
-	while (looping) {
-
-		luckyint = getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
-		luckyDigitCount = getIntDigitCount(luckyint);
-
-		if (luckyint <= N) {
-			luckiesTotal++;
-		}
-
-		if (checkAllPermutationsFinished(luckycandidate)) {
-			looping = false;
-		}
-
-		counter++; //increment intCounter, from which we get the next enumerated luckynumber
-		luckycandidate = getEncodingFromInt(counter, unavailableBits); //store the intCounter into encoded format in luckycandidate
-		int debug5 = 5;//only for debugbreakpoints
-
-	}
 
 
 
-	return luckiesTotal;
 
-}
-
-
-
-unsigned int refactored_getLuckyNumbers3(unsigned int N) {
+size_t refactored_getLuckyNumbers3(size_t N) {
 
 	//static const unsigned int maxBits = 32;
 	std::string luckycandidate(globals::g_maxBits, '-');
-	const unsigned int n_digitcount = getIntDigitCount(N);
+	const size_t n_digitcount = getIntDigitCount(N);
 	
 	// allow only n_digitcount amount of bits to be used in the
 	// luckycandidate to represent the bits an unsignedinteger (inside the cppstring)
@@ -374,11 +170,11 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 	// the permutations using only the permutationcounter in binary to increment and enumerate the permutations
 	// then we store the permutationcounter value into cppstring 
 	// the first enumerated permutations would be 4444444, 4444474, 4444477 etc...
-	const unsigned int unavailableBits = globals::g_maxBits - n_digitcount;
+	const size_t unavailableBits = globals::g_maxBits - n_digitcount;
 
 	/*format a binary number with only k memorybits available
 	where k = digitCountOfN, and initialize all available bits in memory to 0 value*/
-	for (unsigned int i = 0; i < globals::g_maxBits; i++) {
+	for (auto i = 0; i < globals::g_maxBits; i++) {
 		if (i < unavailableBits) {
 			luckycandidate[i] = '-'; //put a minus sign to represent unavailable storage bits (not being used by 0 and neither by 1)
 		} else {
@@ -387,8 +183,8 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 	}
 
 	luckycandidate[globals::g_maxBits - 1] = '0';
-	unsigned int luckyint = 0, permutationCounter = 0;
-	unsigned int luckiesTotal = 0;
+	size_t luckyint = 0, permutationCounter = 0;
+	size_t luckiesTotal = 0, loopcounter=0;
 	bool looping = true;
 
 	/*count the actual luckynumbers in 1digit, 2digit 3digit etc... numbers
@@ -405,7 +201,7 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 	all 2digit numbers are smaller than 3digit numbers etc...
 	keep the process going with this style of combinatorics counting.
 	*/
-	for (unsigned int i = 1; i < n_digitcount; i++) {
+	for (auto i = 1; i < n_digitcount; i++) {
 		luckiesTotal += pow2(i);
 	}
 	int debug67 = 67; //only for debugbreakpoints
@@ -413,7 +209,7 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 	while (looping) {
 
 		luckyint = refactored_getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
-
+		++loopcounter;
 		if (luckyint <= N) {
 			++luckiesTotal;
 		}
@@ -427,7 +223,7 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 		int debug5 = 5;//only for debugbreakpoints
 
 	}
-
+	printf("algoloop ran ull% times\n",loopcounter);
 	return luckiesTotal;
 
 }
@@ -438,9 +234,9 @@ unsigned int refactored_getLuckyNumbers3(unsigned int N) {
 
 int main()
 {
-	unsigned int mediuminput = 888888888;
-	unsigned int largeinput= (2147'483'640 - 1) * 2;
-	unsigned int N = mediuminput;
+	size_t mediuminput = 999'999'987;
+	size_t largeinput =  18446744073709551611;
+	size_t N = largeinput;
     std::cout << "Hello World!\n";
 	auto start = std::chrono::high_resolution_clock::now();
 	auto foundLuckiesCount = refactored_getLuckyNumbers3(N);
@@ -454,7 +250,7 @@ int main()
 	// probably commenc out this dumbLucky calculation if you have large inputsizes N
 	// it will be super laggy
 	// bearable but laggy  choice for comparison for size of N might be N == 888'888'888
-	unsigned int dumbLuckyCount = 0;
+	/*unsigned int dumbLuckyCount = 0;
 	 start = std::chrono::high_resolution_clock::now();
 	for (unsigned int j = 1; j <= N; ++j) {
 		dumbLuckyCount += dumbLucky(j);
@@ -462,7 +258,7 @@ int main()
 	 stop = std::chrono::high_resolution_clock::now();
 	 duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 	std::cout << "dumbLucky count was: " << dumbLuckyCount << ", duration was us=" << duration.count() << std::endl;
-
+	*/
 
 
 
