@@ -8,7 +8,6 @@
 #include <vector>
 #include <cstdlib>
 
-typedef unsigned long long ull;
 
 namespace globals {
 	constexpr const size_t g_maxBits = 64;
@@ -17,23 +16,19 @@ namespace globals {
 }
 
 
-//get luckynumbers from 1,2,3...N interval inclusive
 /*count the amount of luckynumbers in interval [1,N]
 where 1<=N<=1 billion
 luckynumber is any number which consists of only the digits 4 or 7.
 e.g. 44,444, 474, 774, 747, 7777...
 */
 
-//the clear way to calculate the luckynumbers
-//iterate thru all of them
-// timecomplexity O(N), laggy with huge numbers
-// this function below actually just checks if 
-// a single number num == luckynumber
-
 /*known testcases
 System.out.println(o.laske(1,10)); // 2
 System.out.println(o.laske(1,1000000)); // 126
 make time limit under 1 second. (originally it was java code time limit)*/
+
+
+
 
 
 
@@ -47,7 +42,11 @@ size_t checkInputSizeN(size_t N){
 		return truncated_n;
 	}
 }
-
+/*the clear way to calculate the luckynumbers
+iterate thru all of them
+ timecomplexity O(N), laggy with huge numbers
+ this function below actually just checks if 
+ a single number num == luckynumber*/
 size_t dumbLucky(size_t num) {
 	static const size_t lucky4 = 4, lucky7 = 7;
 	while (num > 0) {
@@ -82,6 +81,7 @@ size_t getIntDigitCount(size_t n) {
 }
 
 bool checkAllPermutationsFinished(const std::string& binstr) {
+	
 	for (auto& c : binstr) {
 		if (c == '0') {
 			return false;
@@ -138,8 +138,8 @@ std::string refactored_getEncodingFromInt(size_t number, size_t unavailableBits)
 	//encode the unsigned int into cppstring
 	//where the unavailableBits are -, and other bits are of course 0 and 1
 	//unavailableBits would be "forbidden bits" so that the other bits are "memorybits"
-	//so to re-cap, memorybits are any bits that are allowedmemory from 32bit int
-	//and unavailableBits are any bits that are unavailablememory from 32bit int
+	//so to re-cap, memorybits are any bits that are allowedmemory from 64bit int, '1' or '0'
+	//and unavailableBits are any bits that are unavailablememory from 64bit int, padded as '-'
 
 	std::string tempstr(globals::g_maxBits,'0');
 
@@ -153,13 +153,11 @@ std::string refactored_getEncodingFromInt(size_t number, size_t unavailableBits)
 			tempstr[globals::g_maxBits - 1 - i] = '0';
 		}
 	}
-	int debug88 = 88;//only for debugbreakpoints
 	//declare emptyBits on the lefthand side of the mostSignificantBit =1
 	//so that we only utilize as many bits as required.
 	for (auto i = 0; i < unavailableBits; i++) {
 		tempstr[i] = '-';
 	}
-	int debug9 = 9;//only for debugbreakpoints
 	return tempstr;
 }
 
@@ -173,29 +171,29 @@ size_t refactored_getLuckyNumbers3(size_t N) {
 
 	std::string luckycandidate(globals::g_maxBits, '-');
 	const size_t n_digitcount = getIntDigitCount(N);
-	
-	// allow only n_digitcount amount of bits to be used in the
-	// luckycandidate to represent the bits an unsignedinteger (inside the cppstring)
-	// the rest of the 32bits are padded with '-' characters such as if 
-	// n_digitcount == 7, we would have 7 bits of memory available and using zero padding
-	// in the form of -------------------------0000000
-	// the padding with '-' chars makes it easier to extract the permutations and their integer values,
-	// according to an encoding/decoding scheme such that 0->4, and 1->7, so that we are able to enumerate all
-	// the permutations using only the permutationcounter in binary to increment and enumerate the permutations
-	// then we store the permutationcounter value into cppstring 
-	// the first enumerated permutations would be 4444444, 4444474, 4444477 etc...
-	const size_t unavailableBits = globals::g_maxBits - n_digitcount;
 
+	/*allow only n_digitcount amount of bits to be used in the
+	luckycandidate to represent the bits an unsignedinteger (inside the cppstring)
+	the rest of the 32bits are padded with '-' characters such as if
+	n_digitcount == 7, we would have 7 bits of memory available and using zero padding
+	in the form of -------------------------0000000
+	the padding with '-' chars makes it easier to extract the permutations and their integer values,
+	according to an encoding/decoding scheme such that 0->4, and 1->7, so that we are able to enumerate all
+	the permutations using only the permutationcounter in binary to increment and enumerate the permutations
+	then we store the permutationcounter value into cppstring
+	the first enumerated permutations would be 4444444, 4444474, 4444477 etc...
+   */
+	const size_t unavailableBits = globals::g_maxBits - n_digitcount;
 	/*format a binary number with only k memorybits available
 	where k = digitCountOfN, and initialize all available bits in memory to 0 value*/
 	for (auto i = 0; i < globals::g_maxBits; i++) {
-		if (i >= unavailableBits){ //make the integer zero-padded
-			luckycandidate[i] = '0'; 
+		if (i >= unavailableBits) { //make the integer zero-padded
+			luckycandidate[i] = '0';
 		}
 	}
 
 	size_t luckyint = 0, permutationCounter = 0;
-	size_t luckiesTotal = 0, loopcounter=0;
+	size_t luckiesTotal = 0, loopcounter = 0;
 	bool looping = true;
 
 	/*count the actual luckynumbers in 1digit, 2digit 3digit etc... numbers
@@ -215,7 +213,6 @@ size_t refactored_getLuckyNumbers3(size_t N) {
 	for (auto i = 1; i < n_digitcount; i++) {
 		luckiesTotal += pow2(i);
 	}
-	int debug67 = 67; //only for debugbreakpoints
 
 	while (looping) {
 
@@ -231,10 +228,8 @@ size_t refactored_getLuckyNumbers3(size_t N) {
 
 		++permutationCounter; //increment intCounter, from which we get the next enumerated luckynumber
 		luckycandidate = refactored_getEncodingFromInt(permutationCounter, unavailableBits); //store the intCounter into encoded format in luckycandidate
-		int debug5 = 5;//only for debugbreakpoints
-
 	}
-	printf("algoloop ran %llu times\n",loopcounter);
+	printf("algoloop ran %llu times\n", loopcounter);
 	return luckiesTotal;
 
 }
@@ -246,25 +241,22 @@ size_t refactored_getLuckyNumbers3(size_t N) {
 size_t refactored_getLuckyNumbers4(size_t N) {
 
 	std::string luckycandidate(globals::g_maxBits, '-');
-
+	
 
 	const size_t n_digitcount = getIntDigitCount(N);
 
-	// allow only n_digitcount amount of bits to be used in the
-	// luckycandidate to represent the bits an unsignedinteger (inside the cppstring)
-	// the rest of the 32bits are padded with '-' characters such as if 
-	// n_digitcount == 7, we would have 7 bits of memory available and using zero padding
-	// in the form of -------------------------0000000
-	// the padding with '-' chars makes it easier to extract the permutations and their integer values,
-	// according to an encoding/decoding scheme such that 0->4, and 1->7, so that we are able to enumerate all
-	// the permutations using only the permutationcounter in binary to increment and enumerate the permutations
-	// then we store the permutationcounter value into cppstring 
-	// the first enumerated permutations would be 4444444, 4444447, 4444474, 4444477 etc...
+	 /*allow only n_digitcount amount of bits to be used in the
+	 luckycandidate to represent the bits an unsignedinteger (inside the cppstring)
+	 the rest of the 32bits are padded with '-' characters such as if 
+	 n_digitcount == 7, we would have 7 bits of memory available and using zero padding
+	 in the form of -------------------------0000000
+	 the padding with '-' chars makes it easier to extract the permutations and their integer values,
+	 according to an encoding/decoding scheme such that 0->4, and 1->7, so that we are able to enumerate all
+	 the permutations using only the permutationcounter in binary to increment and enumerate the permutations
+	 then we store the permutationcounter value into cppstring 
+	 the first enumerated permutations would be 4444444, 4444447, 4444474, 4444477 etc...*/
+	
 	const size_t unavailableBits = globals::g_maxBits - n_digitcount;
-
-
-
-
 
 	/*format a binary number with only k memorybits available
 	where k = digitCountOfN, and initialize all available bits in memory to 0 value*/
@@ -273,6 +265,8 @@ size_t refactored_getLuckyNumbers4(size_t N) {
 			luckycandidate[i] = '0';
 		}
 	}
+
+	std::string tempBuffer(luckycandidate);
 
 	//luckycandidate[globals::g_maxBits - 1] = '0';
 	size_t luckyint = 0, permutationCounter = 0;
@@ -296,7 +290,6 @@ size_t refactored_getLuckyNumbers4(size_t N) {
 	for (auto i = 1; i <= n_digitcount - 1; ++i) {
 		luckiesTotal += pow2(i);
 	}
-	int debug67 = 67; //only for debugbreakpoints
 
 	while (looping) {
 
@@ -313,15 +306,143 @@ size_t refactored_getLuckyNumbers4(size_t N) {
 		}
 		++permutationCounter; //increment intCounter, from which we get the next enumerated luckynumber
 		luckycandidate = refactored_getEncodingFromInt(permutationCounter, unavailableBits); //store the intCounter into encoded format in luckycandidate
-
-		
-		int debug5 = 5;//only for debugbreakpoints
-
 	}
 	printf("algoloop ran %llu times\n", loopcounter);
 	return luckiesTotal;
 
 }
+
+
+void fast_getEncodingFromInt(const size_t& permutation_counter, const size_t& unavailable_bits, std::string& binstr){
+	
+		//encode the unsigned int into cppstring
+		//where the unavailableBits are -, and other bits are of course 0 and 1
+		//unavailableBits would be "forbidden bits" so that the other bits are "memorybits"
+		//so to re-cap, memorybits are any bits that are allowedmemory from 64bit int, '1' or '0'
+		//and unavailableBits are any bits that are unavailablememory from 64bit int, padded as '-'
+		//put the binaryDigits into string form e.g. "100101"
+
+		for (auto i = 0; i < globals::g_maxBits; i++) {
+			auto bit = getBitPosition(permutation_counter, i);
+			if (bit) {
+				binstr[globals::g_maxBits - 1 - i] = '1';
+			} else {
+				binstr[globals::g_maxBits - 1 - i] = '0';
+			}
+		}
+		//declare emptyBits on the lefthand side of the mostSignificantBit =1
+		//so that we only utilize as many bits as required.
+		for (auto i = 0; i < unavailable_bits; i++) {
+			binstr[i] = '-';
+		}
+		//int debug33 = 33;
+}
+
+void fast_getIntFromEncoding(std::string& binstr, size_t& luckyint){
+
+	/*loop the string to get the chars
+	if the char is 0 => it will become 4
+	if the char is 1 => it will become 7
+	use libraryfunction to get the decimalvalue and return it
+	*/
+
+	for (auto i = 0; i < globals::g_maxBits; i++) {
+		char curLetter = binstr[i];
+		if (curLetter == '0') {
+			binstr[i] = '4';
+		} else if (curLetter == '1') {
+			binstr[i] = '7';
+		} else if (curLetter == '-') {
+			binstr[i] = '0';
+		}
+	}
+
+	auto res0 = strtoull(binstr.c_str(), 0, 10);
+	luckyint = ( size_t) res0;
+	//int debug66 = 66;
+}
+
+
+size_t fast_refactored_getLuckyNumbers5(size_t N) {
+
+	std::string luckycandidate(globals::g_maxBits, '-');
+	const size_t n_digitcount = getIntDigitCount(N);
+
+	/*allow only n_digitcount amount of bits to be used in the
+	luckycandidate to represent the bits an unsignedinteger (inside the cppstring)
+	the rest of the 32bits are padded with '-' characters such as if
+	n_digitcount == 7, we would have 7 bits of memory available and using zero padding
+	in the form of -------------------------0000000
+	the padding with '-' chars makes it easier to extract the permutations and their integer values,
+	according to an encoding/decoding scheme such that 0->4, and 1->7, so that we are able to enumerate all
+	the permutations using only the permutationcounter in binary to increment and enumerate the permutations
+	then we store the permutationcounter value into cppstring
+	the first enumerated permutations would be 4444444, 4444447, 4444474, 4444477 etc...*/
+
+	const size_t unavailableBits = globals::g_maxBits - n_digitcount;
+
+	/*format a binary number with only k memorybits available
+	where k = digitCountOfN, and initialize all available bits in memory to 0 value*/
+	for (auto i = 0; i < globals::g_maxBits; i++) {
+		if (i >= unavailableBits) { //make the integer zero-padded
+			luckycandidate[i] = '0';
+		}
+	}
+
+
+	size_t luckyint = 0, permutationCounter = 0;
+	size_t luckiesTotal = 0;
+	unsigned long long loopcounter = 0;
+	bool looping = true;
+
+	/*count the actual luckynumbers in 1digit, 2digit 3digit etc... numbers
+	where we count until including the (n_digitcount -1) amount of
+	smaller digit numbers
+	counting is done similarly if you imagine that luckynumbers are basically
+	like passwords (permutation with repetition) so that you only have
+	two choices available for each character, either 4 or 7, so that this means that
+	in a three character password (3digit luckynumber) there are actually 2*2*2 luckynumbers
+	in the 3digit range of luckynumbers (this helps, if we know for sure that n_digitcount is a
+	4digit number or larger digit number itself)
+
+	all 3digit numbers are smaller than 4digit numbers
+	all 2digit numbers are smaller than 3digit numbers etc...
+	keep the process going with this style of combinatorics counting.*/
+	for (auto i = 1; i <= n_digitcount - 1; ++i) {
+		luckiesTotal += pow2(i);
+	}
+
+	while (looping) {
+
+		luckyint = refactored_getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
+		++loopcounter;
+		if ((luckyint <= N)) { //this counts included the last possible permutation 
+			++luckiesTotal;
+
+		} else { //enumerating the permutations in increasing order of size, so that after certain point we can stop enumerating
+			looping = false;
+		}
+		if (checkAllPermutationsFinished(luckycandidate)) { //this checks if the last possible permutation was this current loopcounter round=>prevents next round
+			looping = false;
+		}
+
+		++permutationCounter; //increment intCounter, from which we get the next enumerated luckynumber
+		luckycandidate = refactored_getEncodingFromInt(permutationCounter, unavailableBits); //store the intCounter into encoded format in luckycandidate
+	}
+	//printf("algoloop ran %llu times\n", loopcounter);
+	return luckiesTotal;
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -341,14 +462,11 @@ int main()
 	
     std::cout << "Hello World!\n";
 	auto start = std::chrono::high_resolution_clock::now();
-	auto foundLuckiesCount = refactored_getLuckyNumbers4(N);
+	auto foundLuckiesCount = fast_refactored_getLuckyNumbers5(N);
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 	std::cout << "N=" << N << ", luckynumbers_count was: " << foundLuckiesCount << ", duration was us="<< duration.count() <<std::endl;
 	
-
-
-
 	// probably commenc out this dumbLucky calculation if you have large inputsizes N
 	// it will be super laggy
 	// bearable but laggy  choice for comparison for size of N might be N == 888'888'888
