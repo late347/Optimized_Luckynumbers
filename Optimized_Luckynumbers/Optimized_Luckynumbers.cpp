@@ -338,7 +338,7 @@ void fast_getEncodingFromInt(const size_t& permutation_counter, const size_t& un
 		//int debug33 = 33;
 }
 
-void fast_getIntFromEncoding(std::string& binstr, size_t& luckyint){
+void fast_getIntFromEncoding(std::string& binstr, size_t& luckyint, const size_t& unavailablebits){
 
 	/*loop the string to get the chars
 	if the char is 0 => it will become 4
@@ -359,6 +359,16 @@ void fast_getIntFromEncoding(std::string& binstr, size_t& luckyint){
 
 	auto res0 = strtoull(binstr.c_str(), 0, 10);
 	luckyint = ( size_t) res0;
+
+	for (auto i = 0; i < globals::g_maxBits; i++) { //restore the state of the binstr after the strtoull operation
+		if (i < unavailablebits) { //make the integer padded with unavailable bits to restrict permutations
+			binstr[i] = '-';
+		} else if (binstr[i]=='4') {
+			binstr[i] = '0';
+		} else if (binstr[i]=='7') {
+			binstr[i] = '1';
+		}
+	}
 	//int debug66 = 66;
 }
 
@@ -414,7 +424,8 @@ size_t fast_refactored_getLuckyNumbers5(size_t N) {
 
 	while (looping) {
 
-		luckyint = refactored_getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
+		//luckyint = refactored_getIntFromEncoding(luckycandidate); //get the intvalue of the enumerated luckynumber, from encoding
+		fast_getIntFromEncoding(luckycandidate, luckyint, unavailableBits);
 		++loopcounter;
 		if ((luckyint <= N)) { //this counts included the last possible permutation 
 			++luckiesTotal;
@@ -427,24 +438,13 @@ size_t fast_refactored_getLuckyNumbers5(size_t N) {
 		}
 
 		++permutationCounter; //increment intCounter, from which we get the next enumerated luckynumber
-		luckycandidate = refactored_getEncodingFromInt(permutationCounter, unavailableBits); //store the intCounter into encoded format in luckycandidate
+		//luckycandidate = refactored_getEncodingFromInt(permutationCounter, unavailableBits); //store the intCounter into encoded format in luckycandidate
+		fast_getEncodingFromInt(permutationCounter, unavailableBits, luckycandidate);
 	}
-	//printf("algoloop ran %llu times\n", loopcounter);
+	printf("algoloop ran %llu times\n", loopcounter);
 	return luckiesTotal;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -458,7 +458,7 @@ int main()
 	//												 // inside checkInputSize
 	size_t smallinput = 1'000'000'000 - 3;
 	size_t slowandlarge = 999'999'999'999'999'997;
-	size_t N = checkInputSizeN(slowandlarge);
+	size_t N = checkInputSizeN(1000'000'000-3);
 	
     std::cout << "Hello World!\n";
 	auto start = std::chrono::high_resolution_clock::now();
@@ -470,6 +470,8 @@ int main()
 	// probably commenc out this dumbLucky calculation if you have large inputsizes N
 	// it will be super laggy
 	// bearable but laggy  choice for comparison for size of N might be N == 888'888'888
+	
+	
 	/*unsigned int dumbLuckyCount = 0;
 	 start = std::chrono::high_resolution_clock::now();
 	for (unsigned int j = 1; j <= N; ++j) {
