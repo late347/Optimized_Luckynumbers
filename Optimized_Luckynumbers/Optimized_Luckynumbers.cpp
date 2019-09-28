@@ -30,7 +30,34 @@ make time limit under 1 second. (originally it was java code time limit)*/
 
 
 
+// probably commenc out this dumbLucky calculation if you have large inputsizes N
+// it will be super laggy
+// bearable but laggy  choice for comparison for size of N might be N == 888'888'888
+int checkDumbLucky(size_t num) {
+	static const size_t lucky4 = 4, lucky7 = 7;
+	while (num > 0) {
+		if (!(num % 10 == lucky4 || num % 10 == lucky7))
+			return 0;
+		num = num / 10;
+	}
+	return 1;
+}
 
+
+size_t getDumbLuckyNumbers(size_t N){
+
+
+	// probably commenc out this dumbLucky calculation if you have large inputsizes N
+	// it will be super laggy
+	// bearable but laggy  choice for comparison for size of N might be N == 888'888'888
+	size_t dumbLuckyCount = 0;
+	for (size_t j = 1; j <= N; ++j) {
+		dumbLuckyCount += checkDumbLucky(j);
+	}
+	return dumbLuckyCount;
+
+
+}
 
 size_t checkInputSizeN(size_t N){
 	size_t  truncated_n = globals::g_maxLim;
@@ -455,7 +482,7 @@ int main()
 
 	size_t smallinput = 1'000'000'000 - 3;
 	size_t slowandlarge = 999'999'999'999'999'997;
-	size_t N = checkInputSizeN(slowandlarge);
+	size_t N = checkInputSizeN(mediuminput);
 	
     std::cout << "Hello World!\n";
 	auto start = std::chrono::high_resolution_clock::now();
@@ -470,5 +497,12 @@ int main()
 	 stop = std::chrono::high_resolution_clock::now();
 	 duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 	std::cout << "N=" << N << ", refactored_getLuckyNumbers4_Count was: " << foundLuckiesCount << ", duration was us=" << duration.count() << std::endl;
+
+
+	start = std::chrono::high_resolution_clock::now();
+	foundLuckiesCount = getDumbLuckyNumbers(N);
+	stop = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	std::cout << "N=" << N << ", getDumbLuckyNumbers_Count was: " << foundLuckiesCount << ", duration was us=" << duration.count() << std::endl;
 	
 }
