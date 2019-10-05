@@ -489,7 +489,14 @@ int main() {
 	std::cin >> userinput;
 	size_t userint = smallinput;
 	auto res = sscanf_s(userinput.c_str(), "%llu", &userint);
-	size_t N = checkInputSizeN(userint);
+	size_t N;
+	if (res>=1) {
+		N = checkInputSizeN(userint);
+	} else {
+		std::cout << "illegal uint_input detected, reseting N=777'777\n";
+		N = 777'777;
+	}
+	
 
 
 	//fast_refactored_getLuckyNumbers5(N)
